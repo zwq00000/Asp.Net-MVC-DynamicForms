@@ -1,5 +1,5 @@
-企业OA项目启动计划
-==================
+企业OA 平台框架项目启动计划
+===========================
 首先说明一点，这个名字是一个非正式的名称，我不知道这个项目具体叫什么。
 名不正则言不顺，一个好名字就是一个最好的起点。
 
@@ -13,7 +13,7 @@
 6. 必须有一个甲方代表，专业点的名字叫 **产品经理**
 
 
-##Web框架必须有的服务##
+##一、 Web平台框架必须有的特征##
 1. IoC 控制反转，就是高层应用决定底层实现。
  比较好理解的例子比如数据库连接对象我们只用 *System.Data.Common.DbConnection* 抽象类，具体使用哪种数据库在开发业务逻辑的时候不去管他，直到部署时在配置IoC容器使用哪个具体的对象，在不修改代码的情况下，可以连接 ODBC数据源、OleDB、SqlServer等等。
 再高一点，我们要不要用数据库都不去管，只定义好数据访问接口，使得系统可以支持多种持久化方案。
@@ -21,7 +21,7 @@ IoC 容器和对象工厂（Object Factory）的关系，最早在Java中看到�
 IoC 方式很好的解决了多态的矛盾，即我们无法直接新建一个未知的继承对象，因为在写这个对象创建方法时哪个继承的类可能还不存在，间接创建对象比较繁琐，这种繁琐的工作就交给IoC工具去做吧。
 除了典型的数据访问功能需要用IoC来处理以外，业务逻辑中运行时加载的逻辑对象也可以这样由IoC来完成。
 
-2. AOP 面向服务
+2. AOP 面向方面的服务
 
 >AOP（Aspect Orient Programming），也就是面向方面编程，作为面向对象编程的一种补充，专门用于处理系统中分布于各个模块（不同方法）中的交叉关注点的问题，在 Java EE 应用中，常常通过 AOP 来处理一些具有横切性质的系统级服务，如事务管理、安全检查、缓存、对象池管理等。AOP 实现的关键就在于 AOP 框架自动创建的 AOP 代理，AOP 代理主要分为静态代理和动态代理两大类，静态代理以 AspectJ 为代表；而动态代理则以 Spring AOP 为代表。我们知道，OOP引进"抽象"、"封装"、"继承"、"多态"等概念,对万事万物进行抽象和封装，来建立一种对象的层次结构，它强调了一种完整事物的自上而下的关系。但是具体细粒度到每个事物内部的情况，OOP就显得无能为力了。比如日志功能。日志代码往往水平地散布在所有对象层次当中，却与它所散布到的对象的核心功能毫无关系。对于其他很多类似功能，如事务管理、权限控制等也是如此。这导致了大量代码的重复，而不利于各个模块的重用。
 AOP技术则恰恰相反，它利用一种称为"横切"的技术，能够剖解开封装的对象内部，并将那些影响了多个类并且与具体业务无关的公共行为 封装成一个独立的模块（称为切面）。更重要的是，它又能以巧夺天功的妙手将这些剖开的切面复原，不留痕迹的融入核心业务逻辑中。这样，对于日后横切功能的编辑和重用都能够带来极大的方便。
@@ -29,7 +29,19 @@ AOP技术的具体实现，无非也就是通过动态代理技术或者是在�
 
 再具体的实现方式就不多说了，只要清楚 AOP 作为框架服务的一部分，AOP 是非侵入式的。好比一个故事的主线就是那样了，AOP是另外一条辅助线索，可以先编完主线在去调试辅助线索，辅助线索不会也不应当干涉主线的行为。
 
-###Web框架需要提供的服务###
+3. 伸缩性
+
+4. 用户数据隔离
+虽然各个企业用户使用一套基本框架和库程序，但是数据必须有效隔离。不同组织的数据不会存在关联关系。
+由于数据规模无法预估，所以在设计上要有备用数据移植方案，即要有 *Plan A* 还要有 *Plan B*。
+可能的方式有
+ - 数据库分片，即所谓 BigTable方式
+ - 数据库分离，每个组织一套数据库
+ - 数据库文件方式，按照站点目录分别存储
+ - 使用 NoSQL 数据库，一个组织一个目录
+ 
+
+##二、 Web框架需要提供的服务 ##
 
 1. 数据持久化，通常采用的数据库技术、ORM技术、NoSQL技术等
 2. 身份认证
@@ -48,5 +60,70 @@ AOP技术的具体实现，无非也就是通过动态代理技术或者是在�
 
 先扯点和项目无关的话题
 软件 = 工具 的见解不能算错，后面的真实意思是，用户未必按照我们设计的方式来使用软件，所以工具不能百分百满足全部要求就是可以理解的了。看到用户创造性的使用我们的软件，其实是一件很欣慰的事情，哪怕他在用软件的一个Bug在完成自己的工作。
+
+
+##参考##
+IIS 7 的 ASP.NET 生命周期阶段
+下表列出了在 IIS 7.0 集成模式下运行的 ASP.NET 应用程序生命周期的各个阶段。
+
+1. 发出一个对应用程序资源的请求。
+> ASP.NET 应用程序的生命周期以浏览器向 Web 服务器发送请求为起点。
+在 IIS 7.0 经典模式下以及在 IIS 6.0 中，ASP.NET 请求管道与 Web 服务器管道分离。模块仅应用于路由到 ASP.NET ISAPI 扩展的请求。如果请求的资源类型的文件扩展名未显式映射到 ASP.NET，则不会为该请求调用 ASP.NET 功能，因为 ASP.NET 运行时没有处理该请求。
+而在 IIS 7.0 集成模式下，由一个统一的管道处理所有请求。当集成管道收到请求时，该请求将经历所有请求共有的一些阶段。这些阶段由 RequestNotification 枚举表示。所有请求都可以配置为使用 ASP.NET 功能，因为该功能封装在可以访问请求管道的托管代码模块中。例如，即使 .htm 文件扩展名未显式映射到 ASP.NET，对 HTML 页的请求仍会调用 ASP.NET 模块。这使您能对所有资源使用 ASP.NET 身份验证和授权。
+ 
+2. 统一管道接收对应用程序的第一个请求。
+>当统一管道接收对应用程序中的任何资源的第一个请求时，将为 ApplicationManager 类创建一个实例，该实例就是处理请求的应用程序域。应用程序域提供了应用程序之间全局变量的分离，并且使每个应用程序能够单独卸载。在应用程序域中，将为 HostingEnvironment 类创建一个实例，该实例提供对有关应用程序的信息（如存储该应用程序的文件夹的名称）的访问。
+在第一个请求期间，如果需要，将对应用程序中的顶级项进行编译，其中包括 App_Code 文件夹中的应用程序代码。可以根据本主题后面的 IIS 7.0 中的托管代码模块中的说明，在 App_Code 文件夹中包含自定义模块和处理程序。
+ 
+3. 将为每个请求创建响应对象。
+> 在创建了应用程序域并对 HostingEnvironment 对象进行了实例化之后，将创建并初始化应用程序对象，如 HttpContext、HttpRequest 和 HttpResponse。HttpContext 类包含特定于当前应用程序请求的对象，如 HttpRequest 和 HttpResponse 对象。HttpRequest 对象包含有关当前请求的信息，包括 Cookie 和浏览器信息。HttpResponse 对象包含发送到客户端的响应，其中包括所有呈现的输出和 Cookie。
+下面是 IIS 6.0 和 IIS 7.0（在集成模式下，与 .NET Framework 3.0 或更高版本一起运行）之间的某些关键差异：
+可以使用 HttpResponse 对象的 SubStatusCode 属性，设置对失败请求跟踪有用的代码。有关更多信息，请参见 Troubleshooting Failed Requests Using Failed Request Tracing in IIS 7.0（使用 IIS 7.0 中的失败请求跟踪功能解决失败请求存在的问题）。
+HttpResponse 对象的 Headers 属性提供对响应的响应头的访问。
+在一个事件处理程序处理多个 HttpApplication 事件时，可以使用 HttpContext 对象的两个属性 IsPostNotification 和 CurrentNotification。
+HttpRequest 对象的 Headers 和 ServerVariables 属性支持写操作。
+ 
+4. 将 HttpApplication 对象分配给请求
+> 初始化所有应用程序对象之后，将通过创建 HttpApplication 类的实例来启动应用程序。如果应用程序有 Global.asax 文件，则 ASP.NET 会创建从 HttpApplication 类派生的 Global.aspx 类的实例。然后使用该派生类来表示应用程序。
+说明： 
+第一次在应用程序中请求 ASP.NET 页或进程时，将创建 HttpApplication 类的一个新实例。不过，为了尽可能提高性能，可对多个请求重复使用 HttpApplication 实例。
+加载哪些 ASP.NET 模块（如 SessionStateModule）取决于应用程序从父应用程序继承的托管代码模块。这还取决于在应用程序的 Web.config 文件的配置节中配置了哪些模块。在应用程序的 Web.config 的 system.webServer 节中的 modules 元素中添加或移除模块。有关更多信息，请参见 如何：为 IIS 7.0 配置 <system.webServer> 节。
+ 
+5. 由 HttpApplication 管线处理请求。
+> 在处理请求时，HttpApplication 类会执行下列任务。这些事件对于希望在引发关键请求管道事件时运行代码的网页开发人员很有用。如果是在开发自定义模块，并且希望对发往管道的所有请求都调用该模块，则这些事件也很有用。自定义模块实现 IHttpModule 接口。在 IIS 7.0 集成模式下，必须在模块的 Init 方法中注册事件处理程序。
+对请求进行验证，将检查浏览器发送的信息，并确定其是否包含潜在恶意标记。有关更多信息，请参见 ValidateRequest 和脚本侵入概述。
+如果已在 Web.config 文件的 UrlMappingsSection 节中配置了任何 URL，则执行 URL 映射。
+
+ - 引发 BeginRequest 事件。
+ - 引发 AuthenticateRequest 事件。
+ - 引发 PostAuthenticateRequest 事件。
+ - 引发 AuthorizeRequest 事件。
+ - 引发 PostAuthorizeRequest 事件。
+ - 引发 ResolveRequestCache 事件。
+ - 引发 PostResolveRequestCache 事件。
+ - 引发 MapRequestHandler 事件。
+  > 将根据所请求资源的文件扩展名，选择相应的处理程序。处理程序可以是本机代码模块，如 IIS 7.0StaticFileModule，也可以是托管代码模块，如 PageHandlerFactory 类（它处理 .aspx 文件）。
+ - 引发 PostMapRequestHandler 事件。
+ - 引发 AcquireRequestState 事件。
+ - 引发 PostAcquireRequestState 事件。
+ - 引发 PreRequestHandlerExecute 事件。
+ - 为该请求调用合适的 IHttpHandler 类的 ProcessRequest 方法（或异步版 IHttpAsyncHandler..::.BeginProcessRequest）。例如，如果该请求针对某页，则当前的页实例将处理该请求。
+ - 引发 PostRequestHandlerExecute 事件。
+ - 引发 ReleaseRequestState 事件。
+ - 引发 PostReleaseRequestState 事件。
+ - 如果定义了 Filter 属性，则执行响应筛选。
+ - 引发 UpdateRequestCache 事件。
+ - 引发 PostUpdateRequestCache 事件。
+ - 引发 LogRequest 事件。
+ - 引发 PostLogRequest 事件。
+ - 引发 EndRequest 事件。
+ - 引发 PreSendRequestHeaders 事件。
+ - 引发 PreSendRequestContent 事件。
+
+> 说明： 
+只有当应用程序在 IIS 7.0 集成模式下运行，并且与 .NET Framework 3.0 或更高版本一起运行时，才会支持 MapRequestHandler、LogRequest 和 PostLogRequest 事件。
+ 
+ 
+
 
 > Written with [StackEdit](https://stackedit.io/).
